@@ -49,7 +49,7 @@ else:
 logging.basicConfig(level=logging.INFO)
 logging_client = google.cloud.logging.Client()
 # Attaches a Google logging handler to the root logger
-logging_client.setup_logging(logging.INFO)
+logging_client.setup_logging()
 
 @app.route('/')
 def list():
