@@ -30,3 +30,30 @@ def read(pdfdoc_id):
     snapshot = pdfdoc_ref.get()
    
     return document_to_dict(snapshot)
+
+def next_page(limit=10, start_after=None):
+    """This function returns documents from firestore
+
+    Args:
+        limit (int, optional): The number of documents to look for. Defaults to 10.
+        start_after (String, optional): denotes the starting document to begin listing. Defaults to None.
+
+    Returns:
+        tuple: returns a firestore document and the title of the last document found
+    """
+    db = firestore.Client()
+
+    query = db.collection(u'pdfdoc').limit(limit).order_by(u'title')
+
+    if start_after:
+        # Construct a new query starting at this document.
+        query = query.start_after({u'title': start_after})
+
+    docs = query.stream()
+    docs = list(map(document_to_dict, docs))
+
+    last_title = None
+    if limit == len(docs):
+        # Get the last document from the results and set as the last title.
+        last_title = docs[-1][u'title']
+    return docs, last_title
