@@ -57,3 +57,20 @@ def next_page(limit=10, start_after=None):
         # Get the last document from the results and set as the last title.
         last_title = docs[-1][u'title']
     return docs, last_title
+
+def update(data, pdfdoc_id=None):
+    """This function creates or updates an existing document in firestore. When pdfdoc_id is None, it will create the document
+
+    Args:
+        data (Dict): The update data
+        pdfdoc_id (String, optional): The ID of the document that needs to be updated. Defaults to None.
+
+    Returns:
+        Dict: the document with the updated information
+    """
+    db = firestore.Client()
+    pdfdoc_ref = db.collection(u'pdfdoc').document(pdfdoc_id)
+    pdfdoc_ref.set(data)
+    return document_to_dict(pdfdoc_ref.get())
+
+create = update
