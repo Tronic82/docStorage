@@ -74,3 +74,27 @@ def add():
         return redirect(url_for('.view', doc_id=doc['id']))
 
     return render_template('form.html', action='Add', doc={})
+
+@app.route('/docs/<doc_id>/edit', methods=['GET', 'POST'])
+def edit(doc_id):
+    doc = firestore_functions.read(doc_id)
+
+    if request.method == 'POST':
+        data = request.form.to_dict(flat=True)
+
+        # If an image was uploaded, update the data to point to the new image.
+        image_url = upload_doc_file(request.files.get('image'))
+
+        if image_url:
+            data['imageUrl'] = image_url
+
+        doc = firestore_functions.update(data, doc_id)
+
+        return redirect(url_for('.view', doc_id=doc['id']))
+
+    return render_template('form.html', action='Edit', doc=doc)
+
+@app.route('/docs/<doc_id>/delete')
+def delete(doc_id):
+    firestore_functions.delete(doc_id)
+    return redirect(url_for('.list'))
