@@ -74,3 +74,13 @@ def update(data, pdfdoc_id=None):
     return document_to_dict(pdfdoc_ref.get())
 
 create = update
+
+def delete(id):
+    """This function deletes an existing document
+
+    Args:
+        id (String): The ID of the document that needs to be deleted
+    """
+    db = firestore.Client()
+    pdfdoc_ref = db.collection(u'pdfdoc').document(id)
+    pdfdoc_ref.delete()
