@@ -60,3 +60,16 @@ def test_add_post(new_mock_flask_app):
     assert f"{data['authorid']}".encode() in response.data
     assert f"{data['publishedDate']}".encode() in response.data
     assert f"{data['description']}".encode() in response.data
+
+def test_edit_get(new_mock_flask_app):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/docs/<doc_id>/edit' page is requested (GET)
+    THEN check that there is a 200 response and the edit form is shown
+    """
+
+    response = new_mock_flask_app.get("/docs/test/edit")
+    assert response.status_code == 200
+    assert b"Welcome to doc Storage" in response.data
+    assert b"Edit Document" in response.data
+    assert b"Save" in response.data
