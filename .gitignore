@@ -1,3 +1,9 @@
 **venv
 **env
 **__pycache__
+**plantodo.plan
+**.terraform
+**backend.tfvars
+**.terraform.lock.hcl
+**backend.tf
+**.coverage
