@@ -71,11 +71,4 @@ def upload_file(client, file_stream, filename, content_type, bucket=None):
         file_stream,
         content_type=content_type)
 
-    # provide a url to the storage object
-    url = blob.public_url
-
-    # check to see if string needs decoding before being returned
-    if isinstance(url, bytes):
-        url = url.decode('utf-8')
-
-    return url
+    return filename

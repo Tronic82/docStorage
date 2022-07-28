@@ -74,6 +74,24 @@ def add():
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
 
+        # If an image was uploaded, update the data to point to the new image.
+        image_hash = upload_doc_file(request.files.get('image'))
+        data_hash = upload_doc_file(request.files.get('file'))
+        if request.files.get('file'):
+            data_file= request.files.get('file').filename
+
+        if request.files.get('image'):
+            image_file = request.files.get('image').filename
+        
+
+        if image_hash:
+            data[f'{image_file}'] = image_hash
+        
+        if data_hash:
+            data[f'{data_file}'] = data_hash
+
+        
+
         doc = firestore_functions.create(client=firestore_client, data=data,collection_name = current_app.config['firestore_col'])
 
         return redirect(url_for('.view', doc_id=doc['id']))
@@ -89,9 +107,13 @@ def edit(doc_id):
 
         # If an image was uploaded, update the data to point to the new image.
         image_url = upload_doc_file(request.files.get('image'))
+        data_url = upload_doc_file(request.files.get('file'))
 
         if image_url:
             data['imageUrl'] = image_url
+        
+        if data_url:
+            data['fileUrl'] = data_url
 
         doc = firestore_functions.update(client=firestore_client, data=data, pdfdoc_id=doc_id, collection_name = current_app.config['firestore_col'])
 
