@@ -43,3 +43,42 @@ module "vpc_network" {
   project      = var.project_id
   network_name = "docstorage-vpc1"
 }
+
+#create the explicit deny firewall rules:
+resource "google_compute_firewall" "explicit-deny-egress" {
+  depends_on = [
+    module.vpc_network
+  ]
+  name    = "fw-deny-egress"
+  network = module.vpc_network.vpc_name
+
+  deny {
+    protocol = "all"
+  }
+  direction          = "EGRESS"
+  priority           = 65534
+  destination_ranges = ["0.0.0.0/0"]
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}
+
+resource "google_compute_firewall" "explicit-deny-ingress" {
+  depends_on = [
+    module.vpc_network
+  ]
+  name    = "fw-deny-ingress"
+  network = module.vpc_network.vpc_name
+
+  deny {
+    protocol = "all"
+  }
+  direction     = "INGRESS"
+  priority      = 65534
+  source_ranges = ["0.0.0.0/0"]
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}
