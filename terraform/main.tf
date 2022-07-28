@@ -295,7 +295,7 @@ data "google_iam_policy" "admin" {
   binding {
     role = "roles/storage.admin"
     members = [
-      "serviceAccount:data-accessor@single-planet-357417.iam.gserviceaccount.com"
+      "serviceAccount:data-accessor@${var.project_id}.iam.gserviceaccount.com"
     ]
   }
 }
@@ -305,4 +305,37 @@ resource "google_storage_bucket_iam_policy" "policy" {
   depends_on  = [google_storage_bucket.bucket]
   bucket      = google_storage_bucket.bucket.name
   policy_data = data.google_iam_policy.admin.policy_data
+}
+
+resource "google_project_iam_binding" "project-datastore" {
+  provider   = google
+  project    = var.project_id
+  depends_on = [google_storage_bucket.bucket]
+  role       = "roles/datastore.user"
+
+  members = [
+    "serviceAccount:data-accessor@single-planet-357417.iam.gserviceaccount.com"
+  ]
+}
+
+resource "google_project_iam_binding" "project-errorreporting" {
+  provider   = google
+  project    = var.project_id
+  depends_on = [google_storage_bucket.bucket]
+  role       = "roles/errorreporting.admin"
+
+  members = [
+    "serviceAccount:data-accessor@single-planet-357417.iam.gserviceaccount.com"
+  ]
+}
+
+resource "google_project_iam_binding" "project-logwriter" {
+  provider   = google
+  project    = var.project_id
+  depends_on = [google_storage_bucket.bucket]
+  role       = "roles/logging.logWriter"
+
+  members = [
+    "serviceAccount:data-accessor@single-planet-357417.iam.gserviceaccount.com"
+  ]
 }
