@@ -73,3 +73,48 @@ def test_edit_get(new_mock_flask_app):
     assert b"Welcome to doc Storage" in response.data
     assert b"Edit Document" in response.data
     assert b"Save" in response.data
+
+def test_edit_post(new_mock_flask_app):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/docs/<doc_id>/edit' page is requested (POST) and data is provided
+    THEN check that there is a 200 response and the edit form is shown
+    """
+    #first create something to edit
+    data_add = {
+        "title" :"add then edit",
+        "author":"add then edit author",
+        "authorid":"addtheneditauthor_id",
+        "publishedDate": "2022-01-01",
+        "description": "add then edit me"
+    }
+
+    response = new_mock_flask_app.post("/docs/add", follow_redirects=True, data=data_add )    
+    assert response.status_code == 200
+    assert f"{data_add['author']}".encode() in response.data
+    assert f"{data_add['authorid']}".encode() in response.data
+    assert f"{data_add['publishedDate']}".encode() in response.data
+    assert f"{data_add['description']}".encode() in response.data
+    doc_id = flask.request.view_args["doc_id"]
+
+    #now edit
+    data_edited = {
+        "title" :"test edited",
+        "author":"test edited author",
+        "authorid":"testeditauthor_id",
+        "publishedDate": "2022-01-02",
+        "description": "test edited description"
+    }
+
+    response = new_mock_flask_app.post(f"/docs/{doc_id}/edit", follow_redirects=True, data=data_edited )
+    assert response.status_code == 200
+    assert f"{data_edited['author']}".encode() in response.data
+    assert f"{data_edited['title']}".encode() in response.data
+    assert f"{data_edited['authorid']}".encode() in response.data
+    assert f"{data_edited['publishedDate']}".encode() in response.data
+    assert f"{data_edited['description']}".encode() in response.data
+    # ensure previous entry dooesnt exist as should be edited 
+    assert f"{data_add['author']}".encode() not in response.data
+    assert f"{data_add['authorid']}".encode() not in response.data
+    assert f"{data_add['publishedDate']}".encode() not in response.data
+    assert f"{data_add['description']}".encode() not in response.data
