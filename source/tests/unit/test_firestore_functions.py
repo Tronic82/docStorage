@@ -95,3 +95,22 @@ def test_update(new_mock_firestore):
         'nickname': 'happy feet'
     }
     assert firestore_functions.update(client=new_mock_firestore, data=data, pdfdoc_id="test_doc_update", collection_name="fs_unit_test") == {'id': 'test_doc_update','nickname': 'happy feet'}
+
+def test_delete(new_mock_firestore):
+    """ 
+    GIVEN a firestore database instance
+    WHEN ID is provided
+    THEN check the function deletes the firestore document
+    """
+    #create an existing firebase document
+    #create a mock doc
+    doc = new_mock_firestore.collection(u'fs_unit_test').document("test_doc_delete")
+    doc.set({
+        'first': 'Ada_delete',
+        'last': 'Lovelace_delete'
+    })
+    #ensure the doc has been created
+    assert new_mock_firestore.collection(u'fs_unit_test').document("test_doc_delete").get().exists
+    # now delete the document
+    firestore_functions.delete(client=new_mock_firestore, pdfdoc_id="test_doc_delete", collection_name="fs_unit_test")
+    assert not new_mock_firestore.collection(u'fs_unit_test').document("test_doc_delete").get().exists
