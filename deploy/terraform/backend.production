@@ -1,0 +1,6 @@
+terraform {
+    backend "gcs" {
+        bucket = "docstorage-prod-tfstate"
+        prefix= "terraform/application-state"
+    }
+}

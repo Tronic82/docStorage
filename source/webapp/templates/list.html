@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+  {% for message in messages %}
+    <p>{{ message }}<p>
+  {% endfor %}
+{% endwith %}
+
+<h3>Documents Available</h3>
+<a href="/docs/add" class="btn btn-success btn-sm">
+  <i class="glyphicon glyphicon-plus"></i>
+  Add Document to storage
+</a>
+
+{% for doc in docs %}
+<div class="media">
+  <a href="/docs/{{doc.id}}">
+    <div class="media-left">
+      {% if doc.imageThumbnail %}
+        <img src="{{doc.imageThumbnail}}">
+      {% else %}
+        <img src="/static/images/document.png">
+      {% endif %}
+    </div>
+    <div class="media-body">
+      Title: {{doc.title}} ({{doc.author}} ID: {{doc.authorid}})
+    </div>
+  </a>
+</div>
+{% else %}
+<p>No Documents Found</p>
+{% endfor %}
+
+{% if last_title %}
+<nav>
+  <ul class="pager">
+    <li><a href="?start_after={{last_title}}">More</a></li>
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
