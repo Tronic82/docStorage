@@ -126,3 +126,23 @@ resource "google_compute_firewall" "allow-LB" {
     metadata = "INCLUDE_ALL_METADATA"
   }
 }
+
+#create the allow firewall rules for restricted and private endpoint
+resource "google_compute_firewall" "allow-restricted-private" {
+  depends_on = [
+    module.vpc_network
+  ]
+  name    = "fw-allow-restricted-private-egress"
+  network = module.vpc_network.vpc_name
+
+  allow {
+    protocol = "all"
+  }
+  direction          = "EGRESS"
+  priority           = 100
+  destination_ranges = ["199.36.153.4/30", "199.36.153.8/30"]
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}
