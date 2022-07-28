@@ -1,0 +1,41 @@
+#cloud-config
+
+users:
+- name: flaskservice
+  uid: 2000
+  groups: docker
+write_files:
+%{ for container in containers ~}
+- path: /etc/systemd/system/docstorage${container.id}.service
+  permissions: 0644
+  owner: root
+  content: |
+    [Unit]
+    Description=Flask container ${container.id}
+    After=google-startup-scripts.service
+    Wants=local-fs.target network-online.target network.target
+
+    [Service]
+    Type=oneshot
+    User=flaskservice
+    ExecStartPre=/usr/bin/docker-credential-gcr configure-docker --registries=europe-docker.pkg.dev
+    ExecStart=/usr/bin/docker run --restart=unless-stopped -d --cap-drop SYS_CHROOT --privileged=false --memory=${container.resources.limits.memory}m --cpus=${container.resources.limits.cpu} --log-driver=gcplogs --name=docstorage-${container.name} --log-opt labels=docstorage --log-opt gcp-log-cmd=true -p 80:${container.port} %{ for env in container.env ~} -e ${env} %{ endfor ~} ${container.image}
+
+    StandardOutput=journal+console
+    StandardError=journal+console
+    LimitNOFILE=4096
+
+    [Install]
+    WantedBy=multi-user.target
+%{ endfor ~}
+
+runcmd:
+%{ if debug == false}
+- systemctl disable sshd.service
+- systemctl stop sshd.service
+%{ endif}
+- systemctl daemon-reload
+%{ for container in containers ~}
+- systemctl enable docstorage${container.id}.service
+- systemctl start docstorage${container.id}.service
+%{ endfor ~}

@@ -4,7 +4,6 @@ import hashlib
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename
 from flask import current_app
-from google.cloud import storage
 
 def _check_extension(filename, allowed_extensions):
     """This Function checks whether the filename conforms to the allowed extensions
@@ -42,7 +41,7 @@ def _safe_filename(filename):
     hashname = hashlib.sha256(tempname).hexdigest()
     return hashname
 
-def upload_file(file_stream, filename, content_type):
+def upload_file(client, file_stream, filename, content_type, bucket=None):
     """
     Uploads a file to a given Cloud Storage bucket and returns the public url
     to the new object.
@@ -59,9 +58,12 @@ def upload_file(file_stream, filename, content_type):
     _check_extension(filename, current_app.config['ALLOWED_EXTENSIONS'])
     filename = _safe_filename(filename)
 
-    bucketname = os.getenv('GOOGLE_STORAGE_BUCKET') or f"{os.getenv( 'GOOGLE_CLOUD_PROJECT')}-file-bucket"
+    if bucket is None:
+        bucketname = os.getenv('GOOGLE_STORAGE_BUCKET') or f"{os.getenv( 'GOOGLE_CLOUD_PROJECT')}-file-bucket"
+    else:
+        bucketname = bucket
 
-    gcs_client = storage.Client()
+    gcs_client = client
     gcs_bucket = gcs_client.bucket(bucketname)
     blob = gcs_bucket.blob(filename)
 
@@ -69,11 +71,4 @@ def upload_file(file_stream, filename, content_type):
         file_stream,
         content_type=content_type)
 
-    # provide a url to the storage object
-    url = blob.public_url
-
-    # check to see if string needs decoding before being returned
-    if isinstance(url, bytes):
-        url = url.decode('utf-8')
-
-    return url
+    return filename
