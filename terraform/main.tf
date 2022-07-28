@@ -269,3 +269,40 @@ resource "google_kms_crypto_key_iam_member" "crypto_key_storage" {
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member        = "serviceAccount:service-297825076535@gs-project-accounts.iam.gserviceaccount.com"
 }
+
+resource "google_storage_bucket" "bucket" {
+  provider                    = google
+  name                        = "${var.project_id}-storage"
+  location                    = "EU"
+  force_destroy               = true
+  uniform_bucket_level_access = true
+  encryption {
+    default_kms_key_name = google_kms_crypto_key.storage.id
+  }
+
+  lifecycle_rule {
+    condition {
+      age = 45
+    }
+    action {
+      type          = "SetStorageClass"
+      storage_class = "NEARLINE"
+    }
+  }
+}
+# assign role bindings
+data "google_iam_policy" "admin" {
+  binding {
+    role = "roles/storage.admin"
+    members = [
+      "serviceAccount:data-accessor@single-planet-357417.iam.gserviceaccount.com"
+    ]
+  }
+}
+
+resource "google_storage_bucket_iam_policy" "policy" {
+  provider    = google
+  depends_on  = [google_storage_bucket.bucket]
+  bucket      = google_storage_bucket.bucket.name
+  policy_data = data.google_iam_policy.admin.policy_data
+}
