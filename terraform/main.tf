@@ -146,3 +146,39 @@ resource "google_compute_firewall" "allow-restricted-private" {
     metadata = "INCLUDE_ALL_METADATA"
   }
 }
+
+
+#create proxy only subnet
+resource "google_compute_subnetwork" "proxy-only" {
+  provider = google-beta
+  project  = var.project_id
+  name     = "lb-proxy-only-subnetwork"
+  # choose this CIDR range as network has auto created subnets so cant overlap with 10.128.0.0/9
+  ip_cidr_range = "10.127.0.0/23"
+  region        = "europe-west1"
+  purpose       = "REGIONAL_MANAGED_PROXY"
+  role          = "ACTIVE"
+  network       = module.vpc_network.vpc_name
+}
+
+#create the allow firewall rules for communication on the proxy subnet
+resource "google_compute_firewall" "allow-proxies" {
+  depends_on = [
+    module.vpc_network
+  ]
+  name    = "fw-allow-proxies-ingress"
+  network = module.vpc_network.vpc_name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080", "80", "443"]
+  }
+  direction     = "INGRESS"
+  priority      = 100
+  source_ranges = [google_compute_subnetwork.proxy-only.ip_cidr_range]
+  target_tags   = ["allow-proxies"]
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}
