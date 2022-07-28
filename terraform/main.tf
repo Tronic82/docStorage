@@ -182,3 +182,61 @@ resource "google_compute_firewall" "allow-proxies" {
     metadata = "INCLUDE_ALL_METADATA"
   }
 }
+
+#create an address for the load balancer
+resource "google_compute_global_address" "external_with_subnet_and_address" {
+  name         = "docstorage-global-lb-address"
+  address_type = "EXTERNAL"
+}
+
+
+# create KMS key for resource encryption
+resource "google_kms_key_ring" "europe-west1-keyring" {
+  name     = "europe-west1-keyring"
+  location = "europe-west1"
+}
+
+resource "google_kms_key_ring" "europe-keyring" {
+  name     = "europe-keyring"
+  location = "europe"
+}
+
+resource "google_kms_crypto_key" "compute" {
+  name            = "compute"
+  key_ring        = google_kms_key_ring.europe-west1-keyring.id
+  rotation_period = "100000s"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_kms_crypto_key" "storage" {
+  name            = "storage"
+  key_ring        = google_kms_key_ring.europe-keyring.id
+  rotation_period = "100000s"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_kms_crypto_key" "artifact-registry" {
+  name            = "artifactRegistry1"
+  key_ring        = google_kms_key_ring.europe-keyring.id
+  rotation_period = "100000s"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_kms_crypto_key" "artifact-registry-europe-west1" {
+  name            = "artifactRegistry"
+  key_ring        = google_kms_key_ring.europe-west1-keyring.id
+  rotation_period = "100000s"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
