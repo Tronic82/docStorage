@@ -104,13 +104,22 @@ def test_delete(new_mock_firestore):
     """
     #create an existing firebase document
     #create a mock doc
-    doc = new_mock_firestore.collection(u'fs_unit_test').document("test_doc_delete")
-    doc.set({
+    doc1 = new_mock_firestore.collection(u'fs_unit_test').document("test_doc_delete")
+    doc1.set({
         'first': 'Ada_delete',
         'last': 'Lovelace_delete'
     })
+    #create a mock doc, this one must be kept
+    doc1 = new_mock_firestore.collection(u'fs_unit_test').document("test_doc_keep")
+    doc1.set({
+        'first': 'Ada_keep',
+        'last': 'Lovelace_keep'
+    })
     #ensure the doc has been created
     assert new_mock_firestore.collection(u'fs_unit_test').document("test_doc_delete").get().exists
+    assert new_mock_firestore.collection(u'fs_unit_test').document("test_doc_keep").get().exists
     # now delete the document
     firestore_functions.delete(client=new_mock_firestore, pdfdoc_id="test_doc_delete", collection_name="fs_unit_test")
     assert not new_mock_firestore.collection(u'fs_unit_test').document("test_doc_delete").get().exists
+    # ensure any other document created still exists
+    assert new_mock_firestore.collection(u'fs_unit_test').document("test_doc_keep").get().exists
