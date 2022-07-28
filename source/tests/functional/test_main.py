@@ -118,3 +118,34 @@ def test_edit_post(new_mock_flask_app):
     assert f"{data_add['authorid']}".encode() not in response.data
     assert f"{data_add['publishedDate']}".encode() not in response.data
     assert f"{data_add['description']}".encode() not in response.data
+
+def test_delete_get(new_mock_flask_app):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/docs/<doc_id>/delete' page is requested (GET)
+    THEN check that there is a 200 response and the edit form is shown
+    """
+
+    #first create something to delete
+    data = {
+        "title" :"test delete",
+        "author":"test delete author",
+        "authorid":"testdeleteauthor_id",
+        "publishedDate": "2022-01-03",
+        "description": "test delete me"
+    }
+
+    response = new_mock_flask_app.post("/docs/add", follow_redirects=True, data=data )
+    assert response.status_code == 200
+    assert f"{data['author']}".encode() in response.data
+    assert f"{data['authorid']}".encode() in response.data
+    assert f"{data['publishedDate']}".encode() in response.data
+    assert f"{data['description']}".encode() in response.data
+    doc_id = flask.request.view_args["doc_id"]
+
+    # now delete it
+    response = new_mock_flask_app.get(f"/docs/{doc_id}/delete", follow_redirects=True )
+    assert response.status_code == 200
+    assert f"{data['author']}".encode() not in response.data
+    assert f"{data['authorid']}".encode() not in response.data
+    assert f"{data['title']}".encode() not in response.data
