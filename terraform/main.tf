@@ -240,3 +240,32 @@ resource "google_kms_crypto_key" "artifact-registry-europe-west1" {
     prevent_destroy = true
   }
 }
+
+
+#give the artifact registry account access to the kms key
+resource "google_kms_crypto_key_iam_member" "crypto_key_artifactRegistry" {
+  crypto_key_id = google_kms_crypto_key.artifact-registry.id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:service-297825076535@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+}
+
+#give the artifact registry account access to the kms key
+resource "google_kms_crypto_key_iam_member" "crypto_key_artifactRegistry-ew-west1" {
+  crypto_key_id = google_kms_crypto_key.artifact-registry-europe-west1.id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:service-297825076535@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+}
+
+#give the compute account access to the kms key
+resource "google_kms_crypto_key_iam_member" "crypto_key_compute" {
+  crypto_key_id = google_kms_crypto_key.compute.id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:service-297825076535@compute-system.iam.gserviceaccount.com"
+}
+
+#give the storage account access to the kms key
+resource "google_kms_crypto_key_iam_member" "crypto_key_storage" {
+  crypto_key_id = google_kms_crypto_key.storage.id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:service-297825076535@gs-project-accounts.iam.gserviceaccount.com"
+}
