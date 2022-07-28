@@ -82,3 +82,47 @@ resource "google_compute_firewall" "explicit-deny-ingress" {
     metadata = "INCLUDE_ALL_METADATA"
   }
 }
+
+#create the allow firewall rules for health check
+resource "google_compute_firewall" "allow-health-check" {
+  depends_on = [
+    module.vpc_network
+  ]
+  name    = "fw-allow-health-checks-ingress"
+  network = module.vpc_network.vpc_name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080", "80"]
+  }
+  direction     = "INGRESS"
+  priority      = 100
+  source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
+  target_tags   = ["allow-health-checks"]
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}
+
+#create the allow firewall rules for load balancer
+resource "google_compute_firewall" "allow-LB" {
+  depends_on = [
+    module.vpc_network
+  ]
+  name    = "fw-allow-network-lb-health-checks"
+  network = module.vpc_network.vpc_name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080", "80"]
+  }
+  direction     = "INGRESS"
+  priority      = 100
+  source_ranges = ["209.85.152.0/22", "209.85.204.0/22", "35.191.0.0/16"]
+  target_tags   = ["allow-network-lb-health-checks"]
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}
