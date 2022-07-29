@@ -16,7 +16,7 @@ The application consists of the following infrastructure components:
 * The application uses a docker image stored in Artifact Registry. Artifact Registry was chosen as it is the recommended tool for storing container images. It also has fine-grained IAM permissioning, unlike container Registry.
 
 ### Initial Set Up 
-The project relies on a few manual set up to enable the project to work correctly. These are one time steps and once complete, the rest of the infrastructure is managed in code. Note you need “`Docker“` , “`python“` , “`Google Cloud SDK“` and “`terraform“` installed to proceed.
+The project relies on a few manual set up to enable the project to work correctly. These are one time steps and once complete, the rest of the infrastructure is managed in code. Note you need ```Docker``` , ```python``` , ```Google Cloud SDK``` and ```terraform``` installed to proceed.
 1. Create a deployment service account that will run the deployment. This needs to be created by someone with the appropriate roles
 2. Create a GCS bucket. It can be named anything but has to be unique. Make note of the bucket name
 3. Assign the project editor role to the service account. This allows full access to all resources. This is overly permissive, but we can use the Google recommendation engine to assign only the roles it needs
@@ -24,16 +24,16 @@ The project relies on a few manual set up to enable the project to work correctl
 5. Create the firestore instance, by enabling the API and selecting a region. Ensure to select firestore in native mode. NOTE: you won't be able to change this later
 6. The first components can be created using terraform. Navigate to the terraform folder and add the bucket name to the backend.{environment} file. Then run
 
- “`
+ ```
  ./runtf.sh development N
- “`
+ ```
 
  This will initialize terraform using the development backend and tfvars files. The second argument is whether to deploy or just plan. In this case we want to plan so input N (no)
 
 7. if there are no errors and you are satisfied with the plan, run
-“`
+```
 ./runtf.sh development Y
-“`
+```
 This will deploy the terraform infrastructure. This will create and set up:
 
  1. The VPC network
@@ -64,15 +64,15 @@ This folder contains the terraform code for the initial set up of the project. I
 
 The purpose of these modules is to abstract the creation of typical resources. This allows the developer to focus on the desired state of the project and create the resource without having to write terraform code for each resource. This allows the developer to only define the resources need in a variable file.
 There are also backend.{environment} files present. These files contain the configuration of the backend to use for terraform deployments in this folder for different environments. Similarly, there are {environment}.tfvars files. These files work in a similar way, they define an environment's terraform variable values. These 4 files work together with runtf.sh. This shell script takes two arguments: environment -> {development, production} and apply -> {Y(for yes), N(for no)}. The file is run like so:
-“`
+```
 ./runtf.sh {environment} {apply}
-“`
+```
 The script will take the arguments and initialize terraform with the appropriate backend based on the environment chosen. Based on the apply value given, the script will output a terr form plan or apply the configuration. It is advised to first do the plan (apply=N) first to view the changes that will be done. Creating this script allows for easy automation of the resource deployment. As each environment configuration is kept in its own file, changes for one there is low change of mistakenly making changes to the wrong environment.
 
 ###./source
-This folder contains the application code and the test code. It consists of a main.py file, together with a helper module, a flask web app module, template files and a test module. The application is a flask application that uses the flask application factory framework to allow multiple instances of the application to be created for different purposes using a standardized configuration. To run the Flask app, you first need to set the environmental variable “`FLASK_APP“` to the location of main.py. Then run 
-“` flask run“`. This will start up a development version of the flask application. 
-Within this folder contains the tests. The tests cover the unit testing of each helper function used in the application and a functional test of the flask application. The tests are run using “`pytest“`
+This folder contains the application code and the test code. It consists of a main.py file, together with a helper module, a flask web app module, template files and a test module. The application is a flask application that uses the flask application factory framework to allow multiple instances of the application to be created for different purposes using a standardized configuration. To run the Flask app, you first need to set the environmental variable ```FLASK_APP``` to the location of main.py. Then run 
+``` flask run```. This will start up a development version of the flask application. 
+Within this folder contains the tests. The tests cover the unit testing of each helper function used in the application and a functional test of the flask application. The tests are run using ```pytest```
 
 ###./deploy
 This folder contains the main terraform code for the infrastructure of the application. This folder is dependent on the right APIs and resources having been built first. The structure of this is broken down similar to the above terraform folder. It consists of modules that abstract the application components, leaving the developer to only define the values of the variables needed to create a complete working application infrastructure.
@@ -110,3 +110,4 @@ If I had more time I would've loved adding the following:
 2. As a primarily server less developer, I would have loved to use server less technology like Cloud Run for the application
 3. Add in weighted traffic splitting. As it stands now the application has one live app. Meaning any changes deployed would involve having to route 100% traffic to the new application. Even though testing was done beforehand before the build process, this is still bad practice.
 4. During the development process, I had neglected to make the appropriate DNS changes to allow communication to the private and restricted google endpoints. This was required as the virtual machines had no external IP addresses, as well as the explicit egress block rules blocking this communication. By the time I realised, there was no time to add in a terraform configuration block for this. In the future, I would have added the infrastructure code to make build out this network connectivity
+5. A CI/CD pipeline hasnt been created for this particular application due to running out of time. For the CI/CD pipeline, I would use Jenkins. Since the application is using docker, Packer isnt needed to build any images. The jenkins pipeline would run based on the push to develop, main and creation of git tags. I have included an example Jenkins file that showcases the principles described in the CI/CD section of this application. [Jenkinsfile](./Jenkinsfile)
