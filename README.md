@@ -4,7 +4,7 @@
 In its simpelest form, the application is a Python flask web application hosted on Google CLoud Platform. The repository contains the ccode necessary to create a copy of this app in whichever project.
 The basic Architecture Diagram can be found here [Computing resources with Load Balancer](https://lucid.app/documents/view/e2c2bd70-b4e4-43d6-a8ae-7b604640cf8b)
 
-<div style="width: 640px; height: 480px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:640px; height:480px" src="https://lucid.app/documents/embedded/e2c2bd70-b4e4-43d6-a8ae-7b604640cf8b" id="KwZC9StwjJoi"></iframe></div>
+![](./GCP_docustore.svg)
 
 ### Components
 The application consits of the following infratructure components:
