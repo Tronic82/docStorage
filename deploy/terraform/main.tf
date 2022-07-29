@@ -31,7 +31,7 @@ module "app_component_docstorage" {
   app_name                = "docstorage"
   be_balancing_mode       = "UTILIZATION"
   be_protocol             = "HTTP"
-  container_name          = "europe-docker.pkg.dev/${var.project_id}/docstorage/docstorage:v0.0.4"
+  container_name          = "europe-docker.pkg.dev/${var.project_id}/docstorage/docstorage:v0.1.0"
   network                 = "projects/${var.project_id}/global/networks/docstorage-vpc1"
   port                    = 80
   region                  = "europe-west1"
