@@ -13,6 +13,10 @@
     <i class="glyphicon glyphicon-trash"></i>
     Delete Document
   </a>
+  <a href="/docs/{{doc.id}}/download" class="btn btn-primary btn-sm">
+    <i class="glyphicon glyphicon-download-alt"></i>
+    Download Document
+  </a>
 </div>
 <div class="media-body">
     <h5 class="doc-author">Uploaded By: {{doc.author|default('Unknown', True)}} ID: {{doc.authorid|default('Unknown', True)}} on {{doc.publishedDate}}</h5>
