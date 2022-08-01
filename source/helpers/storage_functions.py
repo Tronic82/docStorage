@@ -72,3 +72,29 @@ def upload_file(client, file_stream, filename, content_type, bucket=None):
         content_type=content_type)
 
     return filename
+
+def download_file(client, file_to_download, bucket=None):
+    """
+    downloads a file from given Cloud Storage bucket 
+
+    Args:
+        file_to_download (String): The name of the gcs object that needs to be downloaded 
+        bucket (String): name of the buccket. defaults to None
+        client (): the GCS client to use
+
+    Returns:
+        blob: a file object
+    """
+
+    if bucket is None:
+        bucketname = os.getenv('GOOGLE_STORAGE_BUCKET') or f"{os.getenv( 'GOOGLE_CLOUD_PROJECT')}-file-bucket"
+    else:
+        bucketname = bucket
+
+    gcs_client = client
+    gcs_bucket = gcs_client.bucket(bucketname)
+    blob = gcs_bucket.blob(file_to_download)
+
+    data = blob.download_as_string()
+
+    return data
