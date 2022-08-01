@@ -130,6 +130,8 @@ def edit(doc_id):
 
 @app.route('/docs/<doc_id>/delete')
 def delete(doc_id):
+    #TODO: also delete the file in google storage
+    #TODO: maybe also add notify user that the file will be permanantly deleted?
     firestore_functions.delete(client=firestore_client, pdfdoc_id=doc_id,collection_name = current_app.config['firestore_col'])
     return redirect(url_for('.list'))
 
