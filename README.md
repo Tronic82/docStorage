@@ -55,7 +55,7 @@ The project is split up into 4 main sections:
 4. Terraform: This folder contains the terraform files for the initial project set up described above. This is separate from the deploy folder because the initial set up should ideally be done once whereas the deploy code can go through multiple iterations.
 
 The below section describes each folder in depth
-###./terraform
+### ./terraform
 This folder contains the terraform code for the initial set up of the project. It consists of 3 terraform modules:
 
 1. ./terraform/modules/API: A terraform module that abstracts the enabling of APIs. This module takes in a list of APIs as a variable and enables them
