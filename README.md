@@ -69,12 +69,12 @@ There are also backend.{environment} files present. These files contain the conf
 ```
 The script will take the arguments and initialize terraform with the appropriate backend based on the environment chosen. Based on the apply value given, the script will output a terr form plan or apply the configuration. It is advised to first do the plan (apply=N) first to view the changes that will be done. Creating this script allows for easy automation of the resource deployment. As each environment configuration is kept in its own file, changes for one there is low change of mistakenly making changes to the wrong environment.
 
-###./source
+### ./source
 This folder contains the application code and the test code. It consists of a main.py file, together with a helper module, a flask web app module, template files and a test module. The application is a flask application that uses the flask application factory framework to allow multiple instances of the application to be created for different purposes using a standardized configuration. To run the Flask app, you first need to set the environmental variable ```FLASK_APP``` to the location of main.py. Then run 
 ``` flask run```. This will start up a development version of the flask application. 
 Within this folder contains the tests. The tests cover the unit testing of each helper function used in the application and a functional test of the flask application. The tests are run using ```pytest```
 
-###./deploy
+### ./deploy
 This folder contains the main terraform code for the infrastructure of the application. This folder is dependent on the right APIs and resources having been built first. The structure of this is broken down similar to the above terraform folder. It consists of modules that abstract the application components, leaving the developer to only define the values of the variables needed to create a complete working application infrastructure.
 The modules in this folder are:
 
@@ -88,7 +88,7 @@ The modules in this folder are:
 
 The rest of the files in this folder matches up with the terraform folder mentioned above. One thing to note is that the main.tf file specifies a container name. For each new container image you want to deploy, this file must be updated with the new image tag and a deployment made.
 
-###./build
+### ./build
 The build folder contains the Docker file used to build the application code. Containers technology was chosen as it allows for strict versioning of code and multiple deployment avenues. Currently the docker container image is uploaded to Artifact registry and deployed onto virtual machines running COS stable images. The image however, can be deployed to Cloud Run or GKE or locally making the application highly portable.
 
 ## CI/CD
